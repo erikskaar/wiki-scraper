@@ -1,29 +1,29 @@
-import java.io.File
+import kotlinx.coroutines.runBlocking
 import java.net.URL
 
-const val padding = "https://no.wikipedia.org"
+const val padding = "https://en.wikipedia.org"
 
 val regex = "((?=\\/wiki\\/)([^:|?|#]*?)(?=\"))".toRegex()
-
-val endLink = URL("https://no.wikipedia.org/wiki/Jens_Stoltenberg")
-var completeNodeSet = mutableSetOf<Node>()
-var nodeList = mutableListOf<Node>()
+var startTime: Long = 0
+val endLink = URL("https://en.wikipedia.org/wiki/Erna_Solberg")
 var visitedLinks = mutableSetOf<String>()
-var totalLinksChecked = 0
-val fileName = "src/main/resources/output.json"
-val outputFile = File(fileName)
+var nodeList = mutableListOf<BfsNode>()
 
 fun main(args: Array<String>) {
 
-    val mainNode = Node(
+    val startNode = BfsNode(
         parent = null,
-        link = "/wiki/Rita_Ottervik",
+        link = "/wiki/Irish_Republican_Army",
         mutableSetOf(),
         mutableSetOf()
     )
 
-    nodeList.add(mainNode)
-    mainNode.initialize()
-
+    startTime = System.currentTimeMillis()
+    nodeList.add(startNode)
+    startNode.visitChild(startNode)
+    startNode.getChildrenURLs(startNode.content)
+    runBlocking {
+        startNode.visitChildren()
+    }
 }
 
