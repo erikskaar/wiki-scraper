@@ -30,8 +30,6 @@ class BfsNode(
                     child.getChildrenURLs(child.content)
                     children.add(child)
                     nodeList.add(child)
-                    //println("testNodeListLength: ${testNodeList.size}")
-                    //println(Thread.currentThread().name)
                     listParents(child, it)
                 }
             }
@@ -42,6 +40,7 @@ class BfsNode(
 
     fun visitChild(child: BfsNode) {
         try {
+            if (child.link != child.parent?.link) api.createNode(child)
             val completeURL = URL(padding + child.link)
             val currentContent = completeURL.readText()
             child.content = currentContent
@@ -52,6 +51,7 @@ class BfsNode(
 
     private fun isEndLink(link: String) {
         if (URL(padding + link).toString().equals(endLink.toString(), ignoreCase = true)) {
+            api.createNode(BfsNode(this, link, mutableSetOf(), mutableSetOf()))
             prettyPrintPath(link)
         }
     }
@@ -65,10 +65,11 @@ class BfsNode(
         }
         print("Path found!: ")
         parentList.asReversed().forEach {
-            print("$it -> ")
+            print("${it.split("/").last()} -> ")
         }
-        print("$link\n")
+        print("${link.split("/").last()}\n")
         println("Time taken: ${(System.currentTimeMillis() - startTime) / 1000} seconds")
+        api.close()
         exitProcess(0)
     }
 
@@ -89,5 +90,4 @@ class BfsNode(
             visitChildren()
         }
     }
-
 }
